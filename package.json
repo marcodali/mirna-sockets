@@ -2,13 +2,13 @@
   "name": "mirna-socket-as-a-service",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT",
   "type": "module",
+  "license": "MIT",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "socket.io": "^4.6.1"
+    "ws": "^8.13.0"
   }
 }
