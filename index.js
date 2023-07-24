@@ -1,59 +1,50 @@
-import express, { Router } from 'express'
+import express from 'express'
 import { WebSocketServer } from 'ws';
+import { createServer } from 'http'
+import { parse } from 'url'
 
-let dynamicApiRouter = null
-// TODO: route_configs should be replaced by a redis database
-const route_configs = []
 const app = express()
+const socketsMap = new Map();
 
 // Routes
 app.post('/socket', express.json(), (req, res) => {
-  route_configs.push({
-    method: 'get',
-    path: `/${req.body.username}/${req.body.project}`,
-    handler: (request, response) => {
-      response.json({ message: req.body.response })
-    }
+  const dynamicWSS = new WebSocketServer({ noServer: true })
+  dynamicWSS.on('connection', (ws) => {
+    ws.on('error', console.error)
+
+    ws.on('message', (data) => {
+      console.log('<%s>: %s', req.body.response, data)
+    })
   })
-  console.log('route_configs', route_configs)
-  setupDynamicRouter()
-  res.status(201).json({ message: 'new route created successfully' })
+  socketsMap.set(
+    `/ws/${req.body.username}/${req.body.project}`,
+    dynamicWSS,
+  )
+  res.status(201).json({
+    message: 'new WebSocketServer created successfully',
+    url: `ws://localhost:3000/ws/${req.body.username}/${req.body.project}`
+  })
 })
 app.delete('/socket', express.json(), (req, res) => {
   // TODO: pending
 })
 
-// Add routes to dynamicApiRouter from `route_configs`
-const setupDynamicRouter = () => {
-  dynamicApiRouter = new Router()
-  for (const config of route_configs) {
-    dynamicApiRouter[config.method](
-      config.path,
-      config.handler,
-    )
+const server = createServer(app)
+
+server.on('upgrade', (request, socket, head) => {
+  const { pathname } = parse(request.url)
+
+  const wss = socketsMap.get(pathname)
+  if (wss) {
+    wss.handleUpgrade(request, socket, head, (ws) => {
+      wss.emit('connection', ws, request);
+    })
+  } else {
+    socket.destroy()
   }
-}
-
-// Dynamic routes are handled here
-app.use('/ws', (req, res, next) => dynamicApiRouter(req, res, next))
-
-// Error handling middleware
-app.use((req, res, next) => {
-  const err = new Error('Not found')
-  err.status = 404
-  next(err)
 })
 
-// Error handling response
-app.use((err, req, res, next) => {
-  res.status(err.status || 500).json({
-    error: {
-      message: err.message
-    }
-  })
-})
-
-app.listen(process.env.PORT || 3000, err => {
+server.listen(process.env.PORT || 3000, (err) => {
   if (err) console.error(err)
-  console.log("Server ready")
+  console.log('Server ready at http://localhost:3000')
 })
