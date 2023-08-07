@@ -1,33 +1,16 @@
-import express from 'express'
-import { WebSocketServer } from 'ws';
 import { createServer } from 'http'
 import { parse } from 'url'
+import express from 'express'
+import cors from 'cors'
+import injectRoutes, { socketsMap } from './routes.js'
 
 const app = express()
-const socketsMap = new Map();
+
+// Enable CORS
+app.use(cors())
 
 // Routes
-app.post('/socket', express.json(), (req, res) => {
-  const dynamicWSS = new WebSocketServer({ noServer: true })
-  dynamicWSS.on('connection', (ws) => {
-    ws.on('error', console.error)
-
-    ws.on('message', (data) => {
-      console.log('<%s>: %s', req.body.response, data)
-    })
-  })
-  socketsMap.set(
-    `/ws/${req.body.username}/${req.body.project}`,
-    dynamicWSS,
-  )
-  res.status(201).json({
-    message: 'new WebSocketServer created successfully',
-    url: `ws://localhost:3000/ws/${req.body.username}/${req.body.project}`
-  })
-})
-app.delete('/socket', express.json(), (req, res) => {
-  // TODO: pending
-})
+injectRoutes(app)
 
 const server = createServer(app)
 
@@ -37,14 +20,17 @@ server.on('upgrade', (request, socket, head) => {
   const wss = socketsMap.get(pathname)
   if (wss) {
     wss.handleUpgrade(request, socket, head, (ws) => {
-      wss.emit('connection', ws, request);
+      wss.emit('connection', ws, request)
     })
   } else {
     socket.destroy()
   }
 })
 
-server.listen(process.env.PORT || 3000, (err) => {
-  if (err) console.error(err)
-  console.log('Server ready at http://localhost:3000')
+server.listen(process.env.PORT || 5000, (err) => {
+  if (err) {
+    console.error(err)
+    process.exit(0)
+  }
+  console.log('Server ready at http://localhost:5000')
 })

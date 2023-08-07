@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 
-const ws = new WebSocket('ws://localhost:3000/ws/frank/tecuidamos');
+const ws = new WebSocket('ws://localhost:5000/ws/frank/tecuidamos');
 
 ws.on('error', console.error);
 
