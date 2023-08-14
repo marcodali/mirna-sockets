@@ -13,7 +13,6 @@ jobs:
         username: ${{ secrets.USER_NAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          cd /home/ubuntu/mirna-sockets
-          whoami
-          hostnamectl
-          npm run install
+          cd mirna-sockets/
+          /home/ubuntu/.yarn/bin/yarn
+          ls -la
