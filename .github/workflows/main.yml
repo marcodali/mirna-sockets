@@ -22,12 +22,8 @@ jobs:
             USER2: ${secrets.USER_NAME}
       
         run: |
-          echo "$PRIVATE_KEY1"
-          echo "$PRIVATE_KEY2"
           echo "$HOST1"
           echo "$HOST2"
           echo "$HOST3"
           echo "$USER1"
           echo "$USER2"
-          echo "$PRIVATE_KEY1" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER1}@${HOST1} 'hostnamectl'
