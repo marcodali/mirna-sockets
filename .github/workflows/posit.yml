@@ -1,0 +1,21 @@
+name: Deploy on server
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    name: Deploy backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: appleboy/ssh-action@master
+      - name: Build & Deploy
+        with:
+          host: ${{ secrets.HOST_NAME }}
+          username: ${{ secrets.USER_NAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/mirna-sockets
+            yarn
