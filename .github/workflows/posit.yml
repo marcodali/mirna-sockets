@@ -1,11 +1,11 @@
-name: Deploy on server
+name: Chorus
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  deploy:
+  Chorus:
     name: Deploy backend
     runs-on: ubuntu-latest
 
