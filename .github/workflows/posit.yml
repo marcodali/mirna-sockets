@@ -1,21 +1,17 @@
-name: Chorus
-
-on:
-  push:
-    branches: [ main ]
-
+name: remote ssh command
+on: [push]
 jobs:
-  Chorus:
-    name: Deploy backend
-    runs-on: ubuntu-latest
 
+  build:
+    name: Build
+    runs-on: ubuntu-latest
     steps:
-      - uses: appleboy/ssh-action@master
-      - name: Build & Deploy
-        with:
-          host: ${{ secrets.HOST_NAME }}
-          username: ${{ secrets.USER_NAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /home/ubuntu/mirna-sockets
-            yarn
+    - name: executing remote ssh commands
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.HOST_NAME }}
+        username: ${{ secrets.USER_NAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd /home/ubuntu/mirna-sockets
+          yarn
