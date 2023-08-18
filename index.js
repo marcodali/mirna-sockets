@@ -4,6 +4,7 @@ import express from 'express'
 import cors from 'cors'
 import injectRoutes, { socketsMap } from './routes.js'
 
+const PORT = process.env.PORT || 5000
 const app = express()
 
 // Enable CORS
@@ -27,10 +28,10 @@ server.on('upgrade', (request, socket, head) => {
   }
 })
 
-server.listen(process.env.PORT || 5000, (err) => {
+server.listen(PORT, (err) => {
   if (err) {
     console.error(err)
     process.exit(0)
   }
-  console.log('Server ready at http://localhost:5000')
+  console.log(`Server ready at http://localhost:${PORT}`)
 })

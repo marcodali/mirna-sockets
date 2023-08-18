@@ -15,3 +15,8 @@ jobs:
         script: |
           cd mirna-sockets/
           yarn
+          git pull
+          pm2 del index
+          pm2 start index.js
+          pm2 save
+          echo "hice deploy a las" `date` >> ~/log.txt
