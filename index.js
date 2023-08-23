@@ -10,8 +10,31 @@ const app = express()
 // Enable CORS
 app.use(cors())
 
+const logger = (options) => (req, res, next) => {
+  const timestamp = new Date().toISOString()
+  const { method, url, ip, port, hostname, originalUrl } = req
+  console.log(`
+    ${timestamp} ${hostname} ${originalUrl}
+    ${options.level}
+    ${method} ${url} ${port}
+    ${ip}`
+  )
+  next()
+}
+
+const errorHandler = (err, req, res, next) => {
+  console.error('Middleware Error Handling', err)
+  res.status(err.statusCode || 500).send(err?.message || 'Algo malo paso')
+}
+
+// log all requests middleware
+app.use(logger({ level: 'INFO' }))
+
 // Routes
 injectRoutes(app)
+
+// error handling middleware
+app.use(errorHandler)
 
 const server = createServer(app)
 
