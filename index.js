@@ -11,13 +11,10 @@ const app = express()
 app.use(cors())
 
 const logger = (options) => (req, res, next) => {
-  const timestamp = new Date().toISOString()
-  const { method, url, ip, port, hostname, originalUrl } = req
+  const timestamp = new Date().toLocaleString()
+  const { method, url, hostname } = req
   console.log(`
-    ${timestamp} ${hostname} ${originalUrl}
-    ${options.level}
-    ${method} ${url} ${port}
-    ${ip}`
+    at ${timestamp} from ${hostname} ${method} ${url}`
   )
   next()
 }
