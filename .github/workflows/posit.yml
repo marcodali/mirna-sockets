@@ -13,10 +13,11 @@ jobs:
         username: ${{ secrets.USER_NAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          cd mirna-sockets/
-          yarn
-          git pull
+          cd sockets-BE/
           pm2 del index
+          git pull
+          rm -rf node_modules/
+          yarn
           pm2 start index.js
           pm2 save
-          echo "hice deploy a las" `date` >> ~/log.txt
+          echo "hice deploy desde github-actions a las" `date` >> ~/log.txt
