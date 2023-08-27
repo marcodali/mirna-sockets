@@ -13,8 +13,6 @@ jobs:
         username: ${{ secrets.USER_NAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          whoami
-          pwd
           cd /home/ubuntu/sockets-BE
           pm2 del index
           git pull
@@ -22,4 +20,5 @@ jobs:
           yarn
           pm2 start index.js
           pm2 save
+          pm2 show index
           echo "hice deploy desde github-actions a las" `date` >> ~/log.txt
