@@ -1,5 +1,8 @@
 name: AWS Deploy Backend
-on: [push]
+on:
+  push:
+    branches:
+      - main
 jobs:
 
   build:
