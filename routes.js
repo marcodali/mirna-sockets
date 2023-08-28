@@ -7,8 +7,17 @@ const socketsMap = new Map()
 const createWebSocketServer = (req, res, next) => {
     try {
         console.log(req.body.code)
-        const url = `/${req.body.username}/${req.body.project}`
-        const uri = `ws://${process.env.NODE_ENV === 'production' ? 'api.mirna.cloud' : 'localhost:' + PORT}${url}`
+        const path = `/${req.body.username}/${req.body.project}`
+        let protocol, host, port
+        if (process.env.NODE_ENV === 'production') {
+            protocol = 'wss'
+            host = 'api.mirna.cloud'
+            port = ''
+        } else {
+            protocol = 'ws'
+            host = 'localhost'
+            port = ':' + PORT
+        }
 
         // dynamic code execution from user input start running here
         const webSocketServer = new WebSocketServer({ noServer: true })
@@ -19,7 +28,7 @@ const createWebSocketServer = (req, res, next) => {
         socketsMap.set(url, webSocketServer)
         res.status(201).json({
             message: 'WebSocketServer created successfully',
-            uri,
+            uri: `${protocol}://${host}${port}${path}`,
         })
     } catch (err) {
         next(err)
