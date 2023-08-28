@@ -7,8 +7,8 @@ const socketsMap = new Map()
 const createWebSocketServer = (req, res, next) => {
     try {
         console.log(req.body.code)
-        const url = `${req.body.username}/${req.body.project}`
-        const uri = `ws://${process.env.NODE_ENV === 'production' ? 'api.mirna.cloud' : 'localhost:' + PORT}/${url}`
+        const url = `/${req.body.username}/${req.body.project}`
+        const uri = `ws://${process.env.NODE_ENV === 'production' ? 'api.mirna.cloud' : 'localhost:' + PORT}${url}`
 
         // dynamic code execution from user input start running here
         const webSocketServer = new WebSocketServer({ noServer: true })
@@ -18,7 +18,7 @@ const createWebSocketServer = (req, res, next) => {
 
         socketsMap.set(url, webSocketServer)
         res.status(201).json({
-            message: 'new WebSocketServer created successfully',
+            message: 'WebSocketServer created successfully',
             uri,
         })
     } catch (err) {
