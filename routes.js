@@ -25,7 +25,7 @@ const createWebSocketServer = (req, res, next) => {
         codeRunner(webSocketServer)
         // dynamic code execution from user input ends here
 
-        socketsMap.set(url, webSocketServer)
+        socketsMap.set(path, webSocketServer)
         res.status(201).json({
             message: 'WebSocketServer created successfully',
             uri: `${protocol}://${host}${port}${path}`,
