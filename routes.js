@@ -8,19 +8,20 @@ const createWebSocketServer = (req, res, next) => {
     try {
         console.log(req.body.code)
         const url = `${req.body.username}/${req.body.project}`
+        const uri = `ws://${process.env.NODE_ENV === 'production' ? 'api.mirna.cloud' : 'localhost:' + PORT}/${url}`
 
         // dynamic code execution from user input start running here
         const webSocketServer = new WebSocketServer({ noServer: true })
         const codeRunner = new Function('wss', req.body.code)
         codeRunner(webSocketServer)
         // dynamic code execution from user input ends here
-        
+
         socketsMap.set(url, webSocketServer)
         res.status(201).json({
             message: 'new WebSocketServer created successfully',
-            uri: `ws://localhost:${PORT}/${url}`
+            uri,
         })
-    } catch(err) {
+    } catch (err) {
         next(err)
     }
 }
@@ -28,7 +29,7 @@ const createWebSocketServer = (req, res, next) => {
 const deleteWebSocketServer = (req, res) => {
     try {
         res.status(204).send()
-    } catch(err) {
+    } catch (err) {
         next(err)
     }
 }
@@ -36,7 +37,7 @@ const deleteWebSocketServer = (req, res) => {
 const healthCheck = (req, res) => {
     try {
         res.status(204).send()
-    } catch(err) {
+    } catch (err) {
         next(err)
     }
 }
