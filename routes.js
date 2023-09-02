@@ -6,7 +6,8 @@ const socketsMap = new Map()
 
 const getAllWebSocketServers = (req, res, next) => {
     res.json({
-        urls: socketsMap.keys(),
+        keys: Array.from(socketsMap.keys()),
+        values: Array.from(socketsMap.values()),
     })
 }
 
