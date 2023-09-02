@@ -4,6 +4,12 @@ import express from 'express'
 const PORT = process.env.PORT || 5000
 const socketsMap = new Map()
 
+const getAllWebSocketServers = (req, res, next) => {
+    res.json({
+        urls: socketsMap.keys(),
+    })
+}
+
 const createWebSocketServer = (req, res, next) => {
     try {
         console.log(req.body.code)
@@ -35,7 +41,7 @@ const createWebSocketServer = (req, res, next) => {
     }
 }
 
-const deleteWebSocketServer = (req, res) => {
+const deleteWebSocketServer = (req, res, next) => {
     try {
         res.status(204).send()
     } catch (err) {
@@ -43,7 +49,7 @@ const deleteWebSocketServer = (req, res) => {
     }
 }
 
-const healthCheck = (req, res) => {
+const healthCheck = (req, res, next) => {
     try {
         res.status(204).send()
     } catch (err) {
@@ -57,4 +63,5 @@ export default function injectRoutes(app) {
     app.get('/health', express.json(), healthCheck)
     app.post('/socket', express.json(), createWebSocketServer)
     app.delete('/socket', express.json(), deleteWebSocketServer)
+    app.get('/sockets', express.json(), getAllWebSocketServers)
 }
