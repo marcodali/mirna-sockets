@@ -1,64 +1,46 @@
 import 'dotenv/config'
-import express from 'express'
 import cors from 'cors'
+import express from 'express'
 import { createServer } from 'http'
-import { parse } from 'url'
 
+import httpListener from '../pubsub/http.listener.js'
 import createRedis from '../factories/redis.factory.js'
-import { socketProvider } from '../providers/socket.provider.js'
-import listenerCreate from '../listeners/create.listener.js'
-import listenerDelete from '../listeners/delete.listener.js'
-
-const redisMapListener = {
-  create: listenerCreate,
-  delete: listenerDelete,
-}
+import listenerCreate from '../pubsub/create.listener.js'
+import listenerDelete from '../pubsub/delete.listener.js'
+import upgradeListener from '../pubsub/upgrade.listener.js'
+import messageListener from '../pubsub/message.listener.js'
+import socketSubscriber from '../pubsub/socket.subscriber.js'
+import { injectHealthRoutes } from '../routes/index.route.js'
+import { requestLogger, errorHandler } from '../middlewares/basic.middleware.js'
 
 const app = express()
-const channels = Object.keys(redisMapListener)
-
-const subscriber = createRedis()
-export const redis = createRedis()
 
 // Enable CORS
 app.use(cors())
 
-subscriber.subscribe(channels, (err, count) => {
-  if (err) {
-    console.error('At redis subscription something went wrong', err)
-  }
-  console.log(`Subscribed to ${
-    count
-  } channel(s) Listening for messages on the [${
-    channels
-  }] channel(s).`)
-})
+// log all requests middleware
+app.use(requestLogger({ level: 'INFO' }))
 
-subscriber.on('message', (channel, message) => {
-  if (channel in redisMapListener) {
-    redisMapListener[channel](message)
-  }
-})
+// Inject routes to this app
+await injectHealthRoutes(app)
+
+// error handling middleware
+app.use(errorHandler)
 
 const server = createServer(app)
+const subscriber = createRedis()
+export const PORT = process.env.SOCKET_PORT
+export const redis = createRedis()
+export const redisMapListener = {
+  create: listenerCreate,
+  delete: listenerDelete,
+}
+export const channels = Object.keys(redisMapListener)
 
-server.on('upgrade', (request, socket, head) => {
-  const { pathname } = parse(request.url)
+// create websocket servers from code saved in redis
+const _ = (await redis.keys('*')).map(path => listenerCreate(path))
 
-  const wss = socketProvider.getOneSocket(pathname)
-  if (wss) {
-    wss.handleUpgrade(request, socket, head, (ws) => {
-      wss.emit('connection', ws, request)
-    })
-  } else {
-    socket.destroy()
-  }
-})
-
-server.listen(process.env.SOCKET_PORT, (err) => {
-  if (err) {
-    console.error(err)
-    process.exit(0)
-  }
-  console.log(`Socket Server listening at http://localhost:${process.env.SOCKET_PORT}`)
-})
+subscriber.subscribe(channels, socketSubscriber)
+subscriber.on('message', messageListener)
+server.on('upgrade', upgradeListener)
+server.listen(PORT, httpListener)

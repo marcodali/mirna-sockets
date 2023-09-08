@@ -31,3 +31,4 @@ export const injectRoutes = async (app, moduleName) => {
 export const listDirectories = path => readdirSync(path, { withFileTypes: true })
       .filter(file => file.isDirectory())
       .map(directory => directory.name)
+      .sort()

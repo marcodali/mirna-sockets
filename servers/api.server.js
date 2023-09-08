@@ -3,7 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import { createServer } from 'http'
 
-import injectRoutes from '../routes/index.route.js'
+import injectAllRoutes from '../routes/index.route.js'
 import { requestLogger, errorHandler } from '../middlewares/basic.middleware.js'
 import { dbConnection } from '../middlewares/database.middleware.js'
 
@@ -20,7 +20,7 @@ app.use(requestLogger({ level: 'INFO' }))
 app.use(dbConnection)
 
 // Inject routes to this app
-await injectRoutes(app)
+await injectAllRoutes(app)
 
 // error handling middleware
 app.use(errorHandler)

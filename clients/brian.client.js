@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 2000
 const ws = new WebSocket(`ws://localhost:${PORT}/brian/tinderbook`);
 
 ws.on('error', console.error);

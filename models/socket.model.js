@@ -4,15 +4,9 @@ class Socket {
         this.fn = fn
         this.socketServer = socketServer
     }
-    getUrl() {
-        return this.url
-    }
-    getFn() {
-        return this.fn
-    }
-    getSocketServer() {        
-        return this.socketServer
-    }
+    getUrl = () => this.url
+    getFn = () => this.fn
+    getSocketServer = () => this.socketServer
 }
 
 export { Socket }

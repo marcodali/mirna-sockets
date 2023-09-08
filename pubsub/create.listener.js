@@ -14,6 +14,9 @@ export default async function listenerCreate(path) {
         codeRunner(webSocketServer)
         // dynamic code execution from user input ends here
 
+        if (socketProvider.getOneSocket(path)) {
+            throw new Error('Socket already exists')
+        }
         socketProvider.createSocket(path, codeRunner, webSocketServer)
     } catch (error) {
         console.error('At dynamic code execution something went wrong', error)

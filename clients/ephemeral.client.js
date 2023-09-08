@@ -1,7 +1,7 @@
 import WebSocket from 'ws'
 
-//const ws = new WebSocket(`ws://localhost:5000/sadsnake657/blackbir`)
-const ws = new WebSocket(`wss://api.mirna.cloud/goldencat269/fishhead`)
+const ws = new WebSocket(`ws://localhost:2000/whiteswan566/muffin`)
+//const ws = new WebSocket(`wss://api.mirna.cloud/goldencat269/fishhead`)
 
 ws.on('error', console.error)
 
