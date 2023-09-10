@@ -19,13 +19,15 @@ jobs:
         username: ${{ secrets.USER_NAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          pm2 del index
-          rm -rf ~/mirna-sockets/
+          pm2 del api.server socket.server
           git clone git@github.com:marcodali/mirna-sockets.git
           export NODE_ENV=production
+          cp .env ~/mirna-sockets/
           cd ~/mirna-sockets/
           yarn
-          pm2 start index.js
+          pm2 start servers/socket.server.js
+          pm2 start servers/api.server.js
           pm2 save
-          pm2 show index
           echo "hice deploy desde github-actions a las" `date` >> ~/log.txt
+          cd ~/
+          rm -rf ~/mirna-sockets/
