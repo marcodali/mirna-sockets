@@ -21,6 +21,7 @@ jobs:
         script: |
           pm2 del api.server
           pm2 del socket.server
+          rm -rf ~/mirna-sockets/
           git clone git@github.com:marcodali/mirna-sockets.git
           export NODE_ENV=production
           cp .env ~/mirna-sockets/
