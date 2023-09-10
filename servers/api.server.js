@@ -3,12 +3,17 @@ import express from 'express'
 import cors from 'cors'
 import { createServer } from 'http'
 
+import httpListener from '../pubsub/http.listener.js'
 import injectAllRoutes from '../routes/index.route.js'
+import createRedis from '../factories/redis.factory.js'
 import { requestLogger, errorHandler } from '../middlewares/basic.middleware.js'
 import { dbConnection } from '../middlewares/database.middleware.js'
+import shutDown from '../pubsub/shutdown.listener.js'
 
+export const redis = createRedis()
 const PORT = process.env.API_PORT
 const app = express()
+const shutDownSignals = ['SIGTERM', 'SIGINT']
 
 // Enable CORS
 app.use(cors())
@@ -26,11 +31,8 @@ await injectAllRoutes(app)
 app.use(errorHandler)
 
 const server = createServer(app)
-
-server.listen(PORT, (err) => {
-  if (err) {
-    console.error(err)
-    process.exit(0)
-  }
-  console.log(`API Server listening at http://localhost:${PORT}`)
-})
+server.listen(PORT, httpListener('API', PORT))
+shutDownSignals.forEach(signal => process.on(
+    signal,
+    shutDown('API', signal, server, [redis])),
+)

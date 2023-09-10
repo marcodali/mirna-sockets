@@ -1,6 +1,6 @@
-import createRedis from '../factories/redis.factory.js'
+import { redis } from '../servers/api.server.js'
 
 export const dbConnection = (req, res, next) => {
-    req.redis = createRedis()
+    req.redis = redis
     return next()
 }

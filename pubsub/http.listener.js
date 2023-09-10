@@ -1,9 +1,9 @@
-import { PORT } from '../servers/socket.server.js'
-
-export default function httpListener(err) {
+export default function httpListener(name, PORT) {
+  return function _httpListener(err) {
     if (err) {
       console.error(err)
       process.exit(0)
     }
-    console.log(`Socket Server listening at http://localhost:${PORT}`)
+    console.log(`${name} Server listening at http://localhost:${PORT}`)
+  }
 }
