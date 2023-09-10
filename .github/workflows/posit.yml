@@ -29,5 +29,3 @@ jobs:
           pm2 start servers/api.server.js
           pm2 save
           echo "hice deploy desde github-actions a las" `date` >> ~/log.txt
-          cd ~/
-          rm -rf ~/mirna-sockets/
