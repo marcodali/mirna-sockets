@@ -19,7 +19,8 @@ jobs:
         username: ${{ secrets.USER_NAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          pm2 del api.server socket.server
+          pm2 del api.server
+          pm2 del socket.server
           git clone git@github.com:marcodali/mirna-sockets.git
           export NODE_ENV=production
           cp .env ~/mirna-sockets/
