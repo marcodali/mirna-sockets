@@ -34,8 +34,8 @@ const subscriber = createRedis()
 export const PORT = process.env.SOCKET_PORT
 export const redis = createRedis()
 export const redisMapListener = {
-  create: listenerCreate,
-  delete: listenerDelete,
+	create: listenerCreate,
+	delete: listenerDelete,
 }
 export const channels = Object.keys(redisMapListener)
 
@@ -47,6 +47,6 @@ subscriber.on('message', messageListener)
 server.on('upgrade', upgradeListener)
 server.listen(PORT, httpListener('Socket', PORT))
 shutDownSignals.forEach(signal => process.on(
-  signal,
-  shutDown('Socket', signal, server, [redis, subscriber])),
+	signal,
+	shutDown('Socket', signal, server, [redis, subscriber])),
 )

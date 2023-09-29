@@ -1,14 +1,25 @@
 import WebSocket from 'ws'
 
-//const ws = new WebSocket(`ws://localhost:2000/whiteswan566/muffin`)
-const ws = new WebSocket(`wss://socket.mirna.cloud/purplemeercat833/5551212`)
+const ws = new WebSocket('ws://localhost:8080/');
 
-ws.on('error', console.error)
+const pedro = {
+	name: 'Marinoeta',
+	status: 'offline',
+};
 
-ws.on('open', () => {
-  ws.send('soy cox que esperabas?')
-});
+ws.onclose = () => {
+	console.log('[C] cerrado')
+}
 
-ws.on('message', (data) => {
-  console.log('recibido pareja cambio: %s', data)
-})
+ws.onerror = (err) => {
+	console.log('[C] error', err)
+}
+
+ws.onopen = () => {
+	console.log('[C] abierto, sending message...')
+	ws.send(JSON.stringify(pedro))
+}
+
+ws.onmessage = (msg) => {
+	console.log('[C] mensaje', msg.data)
+}

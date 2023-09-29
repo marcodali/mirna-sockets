@@ -6,9 +6,9 @@ const ws = new WebSocket(`ws://localhost:${PORT}/brian/tinderbook`);
 ws.on('error', console.error);
 
 ws.on('open', () => {
-  ws.send('soy briandeveloper.tk')
+	ws.send('soy briandeveloper.tk')
 });
 
 ws.on('message', (data) => {
-  console.log('received: %s', data)
+	console.log('received: %s', data)
 })

@@ -33,6 +33,6 @@ app.use(errorHandler)
 const server = createServer(app)
 server.listen(PORT, httpListener('API', PORT))
 shutDownSignals.forEach(signal => process.on(
-    signal,
-    shutDown('API', signal, server, [redis])),
+	signal,
+	shutDown('API', signal, server, [redis])),
 )
