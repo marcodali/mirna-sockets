@@ -10,48 +10,14 @@ const server = http.createServer((req, res) => {
 // Crea un servidor WebSocket en el mismo puerto que el servidor HTTP
 const wss = new WebSocketServer({ server })
 
-const consoleLogOriginal = console.log
-console.log = (...args) => {
-	sendOutputDataToMirnaUI(args)
-	// Llama al console.log original
-	consoleLogOriginal.apply(console, args)
-}
-
-const sendOutputDataToMirnaUI = (args) => {
-	messageToAll(args
-		.map(arg => {
-			let result
-			if (arg === null) {
-				result = 'null'
-			} else if (arg === undefined) {
-				result = 'undefined'
-			} else if (arg instanceof Date) {
-				result = arg.toLocaleString()
-			} else if (arg instanceof Error) {
-				result = arg.toString()
-			} else if (arg instanceof Map || arg instanceof Set) {
-				result = JSON.stringify([...arg])
-			} else if (arg instanceof Function) {
-				result = arg.toString()
-			} else if (arg instanceof Object) {
-				result = JSON.stringify(arg)
-			} else {
-				result = arg
-			}
-			return result
-		})
-		.join(' '))
-}
-
+// COPY&PASTE code starts here
+const clients = {}
+const sockets = new Set()
 const messageToAll = (msg) => {
 	for (const socket of sockets) {
 		socket.send(msg)
 	}
 }
-
-// COPY&PASTE code starts here
-const clients = {}
-const sockets = new Set()
 
 wss.on('connection', (socket) => {
 

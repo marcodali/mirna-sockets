@@ -1,6 +1,6 @@
 import WebSocket from 'ws'
 
-const ws = new WebSocket('wss://socket.mirna.cloud/greenlion806/premier/events');
+const ws = new WebSocket('wss://socket.mirna.cloud/brownbird951/mommy/events');
 
 ws.onclose = () => {
 	console.log('[C] cerrado')

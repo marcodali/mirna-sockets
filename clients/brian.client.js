@@ -1,10 +1,10 @@
 import WebSocket from 'ws'
 
-const ws = new WebSocket('wss://socket.mirna.cloud/greenlion806/premier');
+const ws = new WebSocket('wss://socket.mirna.cloud/brownbird951/mommy');
 
 const pedro = {
-	name: 'Marinoeta',
-	status: 'offline',
+	name: 'Lucero',
+	status: 'online',
 };
 
 ws.onclose = () => {
