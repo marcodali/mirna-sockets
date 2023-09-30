@@ -4,7 +4,7 @@ export default async function createWebSocketServer(req, res, next) {
 		const channel = 'create'
 		let protocol, host, port
 
-		console.log(req.body.code)
+		console.debug(req.body.code)
 
 		if (process.env.NODE_ENV === 'production') {
 			protocol = 'wss'

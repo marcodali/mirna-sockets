@@ -1,11 +1,6 @@
 import WebSocket from 'ws'
 
-const ws = new WebSocket('ws://localhost:8080/');
-
-const pedro = {
-	name: 'Marinoeta',
-	status: 'offline',
-};
+const ws = new WebSocket('wss://socket.mirna.cloud/greenlion806/premier/events');
 
 ws.onclose = () => {
 	console.log('[C] cerrado')
@@ -16,8 +11,7 @@ ws.onerror = (err) => {
 }
 
 ws.onopen = () => {
-	console.log('[C] abierto, sending message...')
-	ws.send(JSON.stringify(pedro))
+	console.log('[C] abierto')
 }
 
 ws.onmessage = (msg) => {

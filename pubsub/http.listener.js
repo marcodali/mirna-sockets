@@ -4,6 +4,6 @@ export default function httpListener(name, PORT) {
 			console.error(err)
 			process.exit(0)
 		}
-		console.log(`${name} Server listening at http://localhost:${PORT}`)
+		console.info(`${name} Server listening at http://localhost:${PORT}`)
 	}
 }

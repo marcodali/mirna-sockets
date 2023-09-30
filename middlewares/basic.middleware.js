@@ -1,7 +1,7 @@
 export const requestLogger = (options) => (req, res, next) => {
 	const timestamp = new Date().toLocaleString()
 	const { method, url, hostname } = req
-	console.log(`at ${timestamp} from ${hostname} ${method} ${url}`)
+	console.debug(`at ${timestamp} from ${hostname} ${method} ${url}`)
 	next()
 }
 

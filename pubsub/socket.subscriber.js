@@ -4,7 +4,7 @@ export default function socketSubscriber(err, count){
     if (err) {
       console.error('At redis subscription something went wrong', err)
     }
-    console.log(`Subscribed to ${
+    console.info(`Subscribed to ${
     	count
     } channel(s) Listening for messages on the [${
     	channels
