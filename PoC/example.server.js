@@ -35,7 +35,7 @@ wss.on('connection', (ws) => {
 
 	// Eliminar del hashmap el socket recien desconectado
 	ws.on('close', () => {
-		const deadDevelopers = socketMatchDevelopers[ws]
+		const deadDevelopers = socketMatchDevelopers.get(ws)
 		const msg = `[S] El socket, que estaba linkeado a ${
 			Array.from(deadDevelopers)
 		}, se fué 🙁 ni pex vendrán mas`;
@@ -60,13 +60,13 @@ wss.on('connection', (ws) => {
 			name: username,
 			state: getRandomEmoticon(),
 		}
-		socketMatchDevelopers[ws].add(username)
+		socketMatchDevelopers.get(ws).add(username)
 		broadcastDevelopersToAllConnectedSockets()
 	}
 
 	// Agregar al Map el socket recien conectado
 	if (!socketMatchDevelopers.has(ws)) {
-		socketMatchDevelopers[ws] = new Set()
+		socketMatchDevelopers.set(ws, new Set())
 		console.log(
 			'[S] Nuevo socket se ha conectado, ahora hay=',
 			socketMatchDevelopers.size,
@@ -74,6 +74,9 @@ wss.on('connection', (ws) => {
 	} else {
 		console.log('[S] Viejo socket se ha conectado')
 	}
+
+	// Enviar la lista de developers al socket recien conectado
+	ws.send(JSON.stringify(Object.values(developers)))
 
 })
 // COPY&PASTE code ends here

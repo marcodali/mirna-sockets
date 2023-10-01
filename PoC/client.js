@@ -1,6 +1,7 @@
+import 'dotenv/config'
 import WebSocket from 'ws'
 
-const ws = new WebSocket('wss://socket.mirna.cloud/blackelephant686/rusty2');
+const ws = new WebSocket(process.env.EXAMPLE_SERVER_URL);
 
 ws.onclose = () => {
 	console.log('[C] me cerraron la conexión que gachos')
