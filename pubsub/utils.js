@@ -27,7 +27,7 @@ export const createGenesisWebSocketServer = (path, genesisSockets) => {
 		socket.on('close', () => {
 			genesisSockets.delete(socket)
 			console.debug(
-				'[S] for %s 1 socket has gone, total=%d',
+				'[S] for %s a genesis socket has gone, total=%d',
 				path,
 				genesisSockets.size,
 			)
@@ -36,7 +36,7 @@ export const createGenesisWebSocketServer = (path, genesisSockets) => {
 		// Handle errors
 		socket.on('error', (error) => {
 			console.error(
-				'[S] for %s an error has ocurred,',
+				'[S] for %s a genesis socket error has ocurred,',
 				path,
 				error,
 			)
@@ -48,7 +48,7 @@ export const createGenesisWebSocketServer = (path, genesisSockets) => {
 		// Add socket to the set
 		genesisSockets.add(socket)
 		console.debug(
-			'[S] for %s 1 socket has been added, total=%d',
+			'[S] for %s new genesis socket has been added, total=%d',
 			path,
 			genesisSockets.size,
 		)
