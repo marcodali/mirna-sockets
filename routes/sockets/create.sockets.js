@@ -8,7 +8,7 @@ export default async function createWebSocketServer(req, res, next) {
 
 		if (process.env.NODE_ENV === 'production') {
 			protocol = 'wss'
-			host = 'socket.mirna.cloud'
+			host = 'api.mirna.cloud'
 			port = ''
 		} else {
 			protocol = 'ws'
