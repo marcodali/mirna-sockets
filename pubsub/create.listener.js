@@ -23,9 +23,9 @@ export default async function listenerCreate(path) {
 		originalConsoleLog.apply(console, args)
 	}
 
-	const sendOutputDataToMirnaUI = args => sendMessageToGenesisSockets(args
-		.map(argumentToString)
-		.join(' '))
+	const sendOutputDataToMirnaUI = args => sendMessageToGenesisSockets(
+		args.map(argumentToString).join(' ')
+	)
 
 	/**
 	 * What is a genesis socket?
@@ -36,8 +36,11 @@ export default async function listenerCreate(path) {
 	 * by the dynamic user code execution. It can be one or more
 	 */
 	const sendMessageToGenesisSockets = (msg) => {
-		for (const socket of socketProvider
-			.getOneSocket(path).getGenesisSockets()) {
+		const howManyGenesisSockets = socketProvider.getOneSocket(path)?.getGenesisSockets().size || 0
+		if (howManyGenesisSockets === 0) {
+			return
+		}
+		for (const socket of socketProvider.getOneSocket(path).getGenesisSockets()) {
 			socket.send(msg)
 		}
 	}
