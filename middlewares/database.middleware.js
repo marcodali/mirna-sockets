@@ -1,4 +1,4 @@
-import { redis } from '../servers/api.server.js'
+import { redis } from '../servers/api-socket.server.js'
 
 export const dbConnection = (req, res, next) => {
 	req.redis = redis

@@ -5,8 +5,7 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "api": "node servers/api.server.js",
-    "socket": "node servers/socket.server.js"
+    "api": "node servers/api-socket.server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

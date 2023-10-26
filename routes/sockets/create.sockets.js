@@ -13,7 +13,7 @@ export default async function createWebSocketServer(req, res, next) {
 		} else {
 			protocol = 'ws'
 			host = 'localhost'
-			port = ':' + process.env.SOCKET_PORT
+			port = ':' + process.env.API_SOCKET_PORT
 		}
 
 		if (await req.redis.exists(path)) {

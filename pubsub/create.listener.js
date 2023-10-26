@@ -1,6 +1,6 @@
 import { WebSocketServer } from 'ws'
 
-import { redis } from '../servers/socket.server.js'
+import { redis } from '../servers/api-socket.server.js'
 import { socketProvider } from '../providers/socket.provider.js'
 import { argumentToString, createGenesisWebSocketServer } from './utils.js'
 
