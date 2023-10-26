@@ -52,10 +52,6 @@ export default async function listenerCreate(path) {
 		// Create a function from the code string
 		const codeRunner = new Function('wss', 'console', code)
 
-		// dynamic code execution from the user input code starts here
-		codeRunner(userWrittenWSS, console)
-		// dynamic code execution from the user input code ends here
-
 		/**
 		 * Create another websocket server so we
 		 * can send to the UI the console.log messages
@@ -83,10 +79,19 @@ export default async function listenerCreate(path) {
 			() => { },
 			userInterfaceEventsWSS,
 		)
+
+		// let's delay the execution of the dynamic code for 3 second
+		setTimeout(() => {
+			// dynamic code execution (aka DCE) from the user input code starts here
+			console.warn('DCE:OUTPUT for path', path)
+			codeRunner(userWrittenWSS, console)
+			// DCE from the user input code ends here
+		}, 3*1000)
 	} catch (error) {
 		console.error(
 			'At dynamic code execution something went wrong',
 			error,
 		)
+		// TODO: delete the code from redis if an excepiton was thrown
 	}
 }
