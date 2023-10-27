@@ -3,7 +3,8 @@ export default async function createWebSocketServer(req, res, next) {
 		const path = `/${req.body.username}/${req.body.project}`
 		let protocol, host, port
 
-		console.debug(req.body.code)
+		console.info(`New input code from path ${path} received`)
+		console.info(req.body.code)
 
 		if (process.env.NODE_ENV === 'production') {
 			protocol = 'wss'

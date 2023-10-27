@@ -89,17 +89,26 @@ export default async function listenerCreate(path) {
 		try {
 			codeRunner(userWrittenWSS, console)
 		} catch (error) {
-			console.log(
-				'At dynamic code execution something went wrong',
-				error.message,
-			)
-			console.debug('Full Error Stack', error)
-			const customError = new Error('Faltal Error Kill Everything')
-			customError.details = {
-				reason: error.message,
-				path,
+			console.log('At dynamic code execution something went wrong')
+			console.log(error.name, error.message)
+			console.debug('Full Error Stacktrace => ', error.stack)
+			/**
+			 * Delete the code from database because
+			 * this code is not valid and we don't
+			 * want to keep it in redis
+			 */
+			if (error.details) {
+				console.debug(
+					'Paso:',
+					error.name,
+					'Y por esta razón:',
+					error.message,
+					'Se borrará el código de',
+					path,
+					'De la base de datos en redis',
+				)
+				redis.del(error.details.path)
 			}
-			throw customError
 		}
 		// DCE from the user input code ends here
 	}, 3*1000)
