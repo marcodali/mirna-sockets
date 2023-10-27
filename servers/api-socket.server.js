@@ -45,7 +45,8 @@ await injectAllRoutes(app)
 app.use(errorHandler)
 
 // create websocket servers from code saved in redis
-const _ = (await redis.keys('*')).map(path => redis.publish('create', path))
+const publishPromises = (await redis.keys('*')).map(path => redis.publish('create', path))
+await Promise.all(publishPromises)
 
 subscriber.subscribe(channels, socketSubscriber)
 subscriber.on('message', messageListener)
