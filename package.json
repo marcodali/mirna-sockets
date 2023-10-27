@@ -8,10 +8,15 @@
     "api": "node servers/api-socket.server.js"
   },
   "dependencies": {
+    "axios": "^1.6.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "ioredis": "^5.3.2",
+    "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.1",
     "ws": "^8.13.0"
   }
 }
