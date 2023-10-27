@@ -17,10 +17,18 @@ class Socket {
         this.socketServer = socketServer
         this.genesisSockets = genesisSockets
     }
+
+    // Getters
     getUrl = () => this.url
     getFn = () => this.fn
     getSocketServer = () => this.socketServer
     getGenesisSockets = () => this.genesisSockets
+
+    // Setters
+    setUrl = (url) => this.url = url
+    setFn = (fn) => this.fn = fn
+    setSocketServer = (socketServer) => this.socketServer = socketServer
+    setGenesisSockets = (genesisSockets) => this.genesisSockets = genesisSockets
 }
 
 export { Socket }

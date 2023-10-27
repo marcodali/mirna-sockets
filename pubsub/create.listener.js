@@ -48,8 +48,6 @@ export default async function listenerCreate(path) {
 	// Get the code as string from redis
 	const code = await redis.get(path)
 	const userWrittenWSS = new WebSocketServer({ noServer: true })
-	// Create a function from the code string
-	const codeRunner = new Function('wss', 'console', code)
 
 	/**
 	 * Create another websocket server so we
@@ -63,19 +61,19 @@ export default async function listenerCreate(path) {
 	)
 
 	/**
-	 * Both WebSocketServer are running now, but in order
+	 * Both WebSocketServers are running now, but in order
 	 * for them to be publicly accessible we must register
 	 * them within the socketProvider
 	 */
-	socketProvider.createSocket(
+	const babySocket = socketProvider.createSocket(
 		path,
-		codeRunner,
+		() => {},
 		userWrittenWSS,
 		genesisSockets,		// why do we need to pass the genesisSockets here?
 	)
 	socketProvider.createSocket(
 		`${path}/events`,
-		() => { },
+		() => {},
 		userInterfaceEventsWSS,
 		// why we don't pass the genesisSockets here?
 	)
@@ -84,11 +82,15 @@ export default async function listenerCreate(path) {
 
 	// let's delay the execution of the dynamic code for 3 seconds
 	setTimeout(() => {
-		// dynamic code execution (aka DCE) from the user input code starts here
 		console.info('DCE:OUTPUT for path', path)
+		let codeRunner
 		try {
+			// Create a function from the code string
+			codeRunner = new Function('wss', 'console', code)
+			// dynamic code execution (aka DCE) from the user input code starts here
 			codeRunner(userWrittenWSS, console)
 		} catch (error) {
+			redis.del(path)
 			console.log('At dynamic code execution something went wrong')
 			console.log(error.name, error.message)
 			console.debug('Full Error Stacktrace => ', error.stack)
@@ -97,19 +99,16 @@ export default async function listenerCreate(path) {
 			 * this code is not valid and we don't
 			 * want to keep it in redis
 			 */
-			if (error.details) {
-				console.debug(
-					'Paso:',
-					error.name,
-					'Y por esta razón:',
-					error.message,
-					'Se borrará el código de',
-					path,
-					'De la base de datos en redis',
-				)
-				redis.del(error.details.path)
-			}
+			console.debug(
+				'Paso:',
+				error.name,
+				'Y por esta razón:',
+				error.message,
+				'Se borrará el código de',
+				path,
+				'De la base de datos en redis',
+			)
 		}
-		// DCE from the user input code ends here
+		babySocket.setFn(codeRunner)
 	}, 3*1000)
 }
