@@ -71,27 +71,35 @@ export default async function listenerCreate(path) {
 		path,
 		codeRunner,
 		userWrittenWSS,
-		genesisSockets,
+		genesisSockets,		// why do we need to pass the genesisSockets here?
 	)
 	socketProvider.createSocket(
 		`${path}/events`,
 		() => { },
 		userInterfaceEventsWSS,
+		// why we don't pass the genesisSockets here?
 	)
 
-	// let's delay the execution of the dynamic code for 3 second
+	// we need to test all cases: 10, 01, 11, 00
+
+	// let's delay the execution of the dynamic code for 3 seconds
 	setTimeout(() => {
 		// dynamic code execution (aka DCE) from the user input code starts here
 		console.info('DCE:OUTPUT for path', path)
 		try {
 			codeRunner(userWrittenWSS, console)
 		} catch (error) {
-			console.error(
+			console.log(
 				'At dynamic code execution something went wrong',
-				error,
+				error.message,
 			)
-			throw new Error('Faltal Error Kill Everything')
-			// TODO: delete the code from redis if an excepiton was thrown
+			console.debug('Full Error Stack', error)
+			const customError = new Error('Faltal Error Kill Everything')
+			customError.details = {
+				reason: error.message,
+				path,
+			}
+			throw customError
 		}
 		// DCE from the user input code ends here
 	}, 3*1000)

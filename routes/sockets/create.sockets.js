@@ -1,7 +1,6 @@
 export default async function createWebSocketServer(req, res, next) {
 	try {
 		const path = `/${req.body.username}/${req.body.project}`
-		const channel = 'create'
 		let protocol, host, port
 
 		console.debug(req.body.code)
@@ -24,7 +23,7 @@ export default async function createWebSocketServer(req, res, next) {
 
 		// save code into redis database and trigger pub/sub redis event
 		await req.redis.set(path, req.body.code)
-		await req.redis.publish(channel, path)
+		await req.redis.publish('create', path)
 
 		res.status(201).json({
 			message: 'WebSocketServer created successfully',
