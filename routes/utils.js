@@ -23,7 +23,9 @@ export const injectRoutes = async (app, moduleName) => {
 
 		// inject every module route into the app
 		const method = methodsMatch[file.substring(0, 6)]
-		if (method) {
+		if (method && file.substring(0, 6) === 'getOne') {
+			app[method](`/${moduleName}/:id`, express.json(), myRoute)
+		} else {
 			app[method](`/${moduleName}`, express.json(), myRoute)
 		}
 	}
