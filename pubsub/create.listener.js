@@ -46,7 +46,13 @@ export default async function listenerCreate(path) {
 	}
 
 	// Get the code as string from redis and replace console.log with log_info
-	const code = (await redis.get(path)).replace(/console\.log/g, 'log_info')
+	let code = (await redis.get(path))
+		.replace(/console\.log/g, 'log_info')
+		.replace(/console\.info/g, 'log_info')
+		.replace(/console\.warn/g, 'log_info')
+		.replace(/console\.error/g, 'log_info')
+		.replace(/console\.debug/g, 'log_info')
+	code = `return (async function() { ${code} })()`
 
 	/**
 	 * Create another websocket server so we
@@ -66,14 +72,14 @@ export default async function listenerCreate(path) {
 	socketProvider.createSocket(eventsPath, () => {}, userInterfaceEventsWSS)
 
 	// let's delay the execution of the dynamic code for 3 seconds
-	setTimeout(() => {
+	setTimeout(async () => {
 		console.info('DCE:OUTPUT for path', path)
 		let codeRunner
 		try {
 			// Create a function from the code string
 			codeRunner = new Function('wss', 'log_info', ...Object.keys(dependencies), code)
 			// dynamic code execution (aka DCE) from the user input code starts here
-			codeRunner(userWrittenWSS, log_info, ...Object.values(dependencies))
+			await codeRunner(userWrittenWSS, log_info, ...Object.values(dependencies))
 		} catch (error) {
 			redis.del(path)
 			log_info('At dynamic code execution something went wrong')
