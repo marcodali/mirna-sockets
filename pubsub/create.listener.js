@@ -1,8 +1,15 @@
-import { WebSocketServer } from 'ws'
+import WebSocket, { WebSocketServer } from 'ws'
+import axios from 'axios'
+import moment from 'moment'
+import _ from 'lodash'
+import jwt from 'jsonwebtoken'
+import { v4 as uuidv4 } from 'uuid'
 
 import { redis } from '../servers/api-socket.server.js'
 import { socketProvider } from '../providers/socket.provider.js'
 import { argumentToString, createGenericWebSocketServer } from './utils.js'
+
+const dependencies = { axios, moment, _, jwt, uuidv4, WebSocket }
 
 // Listening pub/sub redis events
 export default async function listenerCreate(path) {
@@ -25,11 +32,8 @@ export default async function listenerCreate(path) {
 		const wss = socketProvider?.getOneSocket(_path)?.getSocketServer()
 		// Broadcast the message to all connected clients
 		wss.clients.forEach((client) => {
-			// TODO: check if the client is still connected
-			try {
+			if (client.readyState === WebSocket.OPEN) {
 				client.send(message)
-			} catch (error) {
-				console.error('Error sending message to client', error)
 			}
         })
 	}
@@ -67,13 +71,13 @@ export default async function listenerCreate(path) {
 		let codeRunner
 		try {
 			// Create a function from the code string
-			codeRunner = new Function('wss', 'log_info', code)
+			codeRunner = new Function('wss', 'log_info', ...Object.keys(dependencies), code)
 			// dynamic code execution (aka DCE) from the user input code starts here
-			codeRunner(userWrittenWSS, log_info)
+			codeRunner(userWrittenWSS, log_info, ...Object.values(dependencies))
 		} catch (error) {
 			redis.del(path)
-			console.error('At dynamic code execution something went wrong')
-			console.error(error.name, error.message)
+			log_info('At dynamic code execution something went wrong')
+			log_info(error.name, error.message)
 			console.error('Full Error Stacktrace => ', error.stack)
 			/**
 			 * Delete the code from database because
@@ -81,13 +85,12 @@ export default async function listenerCreate(path) {
 			 * want to keep it in redis
 			 */
 			console.error(
-				'Paso:',
+				'Paso esto:',
 				error.name,
-				'Y por esta razón:',
+				'\nY por esta razón:',
 				error.message,
-				'Se borrará el código del proyecto',
+				'\nSe borrará de Redis el código del proyecto:',
 				path,
-				'De redis',
 			)
 		}
 		userSocket.setFn(codeRunner)
