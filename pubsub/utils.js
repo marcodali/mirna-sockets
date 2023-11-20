@@ -8,8 +8,10 @@ export const argumentToString = (arg) => {
 		result = arg.toLocaleString()
 	} else if (arg instanceof Error) {
 		result = arg.toString()
-	} else if (arg instanceof Map || arg instanceof Set) {
-		result = JSON.stringify([...arg])
+	} else if (arg instanceof Map) {
+		result = `Map(${arg.size}) ${JSON.stringify([...arg])}`
+	} else if (arg instanceof Set) {
+		result = `Set(${arg.size}) ${JSON.stringify([...arg])}`
 	} else if (arg instanceof Function) {
 		result = arg.toString()
 	} else if (arg instanceof Object) {
@@ -20,38 +22,19 @@ export const argumentToString = (arg) => {
 	return result
 }
 
-export const createGenesisWebSocketServer = (path, genesisSockets) => {
-	return function _createGenesisWebSocketServer(socket) {
+export const createGenericWebSocketServer = (path) => {
+	return function _createGenericWebSocketServer(socket) {
 
 		// Handle disconnection
-		socket.on('close', () => {
-			genesisSockets.delete(socket)
-			console.debug(
-				'[S] for %s a genesis socket has gone, total=%d',
-				path,
-				genesisSockets.size,
-			)
-		})
+		socket.on('close', () => console.debug('Client has gone from %s', path))
 
 		// Handle errors
-		socket.on('error', (error) => {
-			console.error(
-				'[S] for %s a genesis socket error has ocurred,',
-				path,
-				error,
-			)
-		})
+		socket.on('error', (error) => console.error('A socket error has ocurred for %s', path, error))
 
 		// Handle incoming messages
 		socket.onmessage = (msg) => { }
 
-		// Add socket to the set
-		genesisSockets.add(socket)
-		console.debug(
-			'[S] for %s new genesis socket has been added, total=%d',
-			path,
-			genesisSockets.size,
-		)
+		console.debug('New client has been connected to %s', path)
 
 	}
 }

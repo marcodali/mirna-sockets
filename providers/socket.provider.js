@@ -10,11 +10,11 @@ const getAllPaths = () => Array.from(urlMapSocket.keys())
 const getOneSocket = (path) => urlMapSocket.get(path)
 
 // Create a new Socket model instance and returns it
-const createSocket = (path, fn, webSocketServer, genesisSockets) => {
+const createSocket = (path, fn, webSocketServer) => {
     if (urlMapSocket.get(path)) {
         throw new Error(`Socket ${path} already exists`)
     }
-    urlMapSocket.set(path, new Socket(path, fn, webSocketServer, genesisSockets))
+    urlMapSocket.set(path, new Socket(path, fn, webSocketServer))
     return urlMapSocket.get(path)
 }
 
