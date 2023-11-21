@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import WebSocket from 'ws'
 
-const ws = new WebSocket(process.env.EXAMPLE_SERVER_URL);
+const ws = new WebSocket(process.env.EXAMPLE_SERVER_URL)
 
 ws.onclose = () => {
 	console.log('[C] me cerraron la conexión que gachos')
@@ -21,5 +21,5 @@ ws.onopen = () => {
 }
 
 ws.onmessage = (msg) => {
-	console.log('[C] el server me mando un msg, pa k o khe?', msg.data)
+	console.log('[C] el server me mando un msg, pa k o khe?', msg.data.toString())
 }
