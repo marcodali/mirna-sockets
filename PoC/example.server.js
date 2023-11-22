@@ -19,6 +19,7 @@ const happyEmoticons = [
 ]
 const happyEmoticonsLength = happyEmoticons.length
 const socketMatchDevelopers = new Map()
+const socketMatchFlag = new Map()
 const developers = {}
 
 // Send the list of developers to all connected sockets
@@ -34,13 +35,48 @@ const getRandomEmoticon = () => happyEmoticons[
 	Math.floor(Math.random() * happyEmoticonsLength)
 ]
 
-wss.on('connection', (ws, req) => {
+const getCountryData = async (ipAddress) => {
+	try {
+		const response = await axios.get(`http://ip-api.com/json/${ipAddress}`)
+		return response.data.countryCode
+	} catch (error) {
+		console.error('Error fetching country data:', error)
+		// NP = Nepal, BT = Bhutan
+		return Math.random() > 0.5 ? 'NP' : 'BT'
+	}
+}
+
+const getCountryEmoji = (countryCode) => {
+	const flagEmojis = {
+		'US': '🇺🇸', // United States
+		'MX': '🇲🇽', // Mexico
+		'CA': '🇨🇦', // Canada
+		'GB': '🇬🇧', // United Kingdom
+		'DE': '🇩🇪', // Germany
+		'JP': '🇯🇵', // Japan
+		'FR': '🇫🇷', // France
+		'IN': '🇮🇳', // India
+		'BR': '🇧🇷', // Brazil
+		'CN': '🇨🇳', // China
+		// Add more countries to the list
+		// ...
+		'NP': '🇳🇵', // Nepal
+		'BT': '🇧🇹', // Bhutan
+		// ...
+		// Add remaining countries until you reach 100
+	};
+
+	return flagEmojis[countryCode] || '🏳️'
+}
+
+wss.on('connection', async (ws, req) => {
 
 	// Delete the recently disconnected socket from the hashmap
 	ws.on('close', () => {
 		const deadDevelopers = socketMatchDevelopers.get(ws)
-		const msg = `This socket was linked to ${Array.from(deadDevelopers).join(', ')}, but has gone away`
+		const msg = `This socket was linked to ${Array.from(deadDevelopers).join(', ') || 'None'}, but has gone away`
 		socketMatchDevelopers.delete(ws)
+		socketMatchFlag.delete(ws)
 		for (const developer of deadDevelopers) {
 			developers[developer].state = '🔴'
 		}
@@ -54,7 +90,7 @@ wss.on('connection', (ws, req) => {
 	})
 
 	// Handle errors
-	ws.on('error', console.error)
+	ws.on('error', error => console.error('Megaerror happened:', error))
 
 	// Handle received messages
 	ws.onmessage = (msg) => {
@@ -63,17 +99,22 @@ wss.on('connection', (ws, req) => {
 		developers[username] = {
 			name: username,
 			state: getRandomEmoticon(),
+			from: socketMatchFlag.get(ws),
 		}
 		socketMatchDevelopers.get(ws)?.add(username)
 		broadcastDevelopersToAllConnectedSockets()
 	}
 
 	// Add the recently connected socket to the Map
-	const ipAddress = req.headers['x-forwarded-for'] || req.socket.remoteAddress
-  	console.log('Client IP:', ipAddress)
+	const ipAddress = (req.headers['x-forwarded-for']?.split(',')[0].trim()) || req.socket.remoteAddress
+	const countryCode = await getCountryData(ipAddress)
+  	const emoji = getCountryEmoji(countryCode)
 	if (!socketMatchDevelopers.has(ws)) {
 		socketMatchDevelopers.set(ws, new Set())
 		console.log('New socket online, new size is =', socketMatchDevelopers.size)
+	}
+	if (!socketMatchFlag.has(ws)) {
+		socketMatchFlag.set(ws, emoji)
 	}
 
 	// Send the list of developers to the recently connected socket
