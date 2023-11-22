@@ -1,13 +1,13 @@
 import { WebSocketServer } from 'ws'
 import http from 'http'
 
-// Crea un servidor HTTP básico
+// Creates a basic HTTP server
 const server = http.createServer((req, res) => {
 	res.writeHead(200, { 'Content-Type': 'text/plain' })
 	res.end('Servidor WebSocket en funcionamiento\n')
 })
 
-// Crea un servidor WebSocket en el mismo puerto que el servidor HTTP
+// Creates a WebSocket server on the same port as the HTTP server
 const wss = new WebSocketServer({ server })
 
 // COPY&PASTE code starts here
@@ -17,71 +17,72 @@ const happyEmoticons = [
 	'😚', '🙂', '🤗', '🤩', '😏', '😌', '😛', '😜',
 	'😝', '🤤', '🤑', '😲', '😳', '🤪', '🥳', '😈',
 ]
+const happyEmoticonsLength = happyEmoticons.length
 const socketMatchDevelopers = new Map()
 const developers = {}
 
-// Enviar la lista de developers a todos los sockets conectados
+// Send the list of developers to all connected sockets
 const broadcastDevelopersToAllConnectedSockets = () => {
+	const devData = JSON.stringify(Object.values(developers))
 	for (const socket of socketMatchDevelopers.keys()) {
-		socket.send(JSON.stringify(Object.values(developers)))
+		socket.send(devData)
 	}
 }
 
+// Get a random emoticon
 const getRandomEmoticon = () => happyEmoticons[
-	Math.floor(Math.random() * happyEmoticons.length)
+	Math.floor(Math.random() * happyEmoticonsLength)
 ]
 
-wss.on('connection', (ws) => {
+wss.on('connection', (ws, req) => {
 
-	// Eliminar del hashmap el socket recien desconectado
+	// Delete the recently disconnected socket from the hashmap
 	ws.on('close', () => {
 		const deadDevelopers = socketMatchDevelopers.get(ws)
-		const msg = `[S] El socket, que estaba linkeado a ${
-			Array.from(deadDevelopers)
-		}, se fué 🙁 ni pex vendrán mas`;
+		const msg = `This socket was linked to ${Array.from(deadDevelopers).join(', ')}, but has gone away`
 		socketMatchDevelopers.delete(ws)
 		for (const developer of deadDevelopers) {
 			developers[developer].state = '🔴'
 		}
-		console.log(msg + ', ahora hay=', socketMatchDevelopers.size)
+		console.log(
+			msg + ', there',
+			socketMatchDevelopers.size <= 1 ? 'is' : 'are',
+			socketMatchDevelopers.size == 0 ? 'None' : socketMatchDevelopers.size,
+			'left',
+		)
 		broadcastDevelopersToAllConnectedSockets()
 	})
 
-	// Manejar errores
-	ws.on('error', (error) => {
-		console.log('[S] Se me salio de control algo', error)
-	})
+	// Handle errors
+	ws.on('error', console.error)
 
-	// Manejar mensajes
+	// Handle received messages
 	ws.onmessage = (msg) => {
 		const username = msg.data
-		console.log('[S] username received', username)
+		console.log('message received:', username)
 		developers[username] = {
 			name: username,
 			state: getRandomEmoticon(),
 		}
-		socketMatchDevelopers.get(ws).add(username)
+		socketMatchDevelopers.get(ws)?.add(username)
 		broadcastDevelopersToAllConnectedSockets()
 	}
 
-	// Agregar al Map el socket recien conectado
+	// Add the recently connected socket to the Map
+	const ipAddress = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+  	console.log('Client IP:', ipAddress)
 	if (!socketMatchDevelopers.has(ws)) {
 		socketMatchDevelopers.set(ws, new Set())
-		console.log(
-			'[S] Nuevo socket se ha conectado, ahora hay=',
-			socketMatchDevelopers.size,
-		)
-	} else {
-		console.log('[S] Viejo socket se ha conectado')
+		console.log('New socket online, new size is =', socketMatchDevelopers.size)
 	}
 
-	// Enviar la lista de developers al socket recien conectado
+	// Send the list of developers to the recently connected socket
 	ws.send(JSON.stringify(Object.values(developers)))
 
 })
 // COPY&PASTE code ends here
 
-// Inicia el servidor HTTP en el puerto 8080
+// Starts the HTTP server on port 8080
 server.listen(8080, () => {
-	consoleLogOriginal('Servidor HTTP en funcionamiento en el puerto 8080')
+	console.log('HTTP server running on port 8080')
 })

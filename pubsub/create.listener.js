@@ -52,7 +52,9 @@ export default async function listenerCreate(path) {
 		.replace(/console\.warn/g, 'log_info')
 		.replace(/console\.error/g, 'log_info')
 		.replace(/console\.debug/g, 'log_info')
-	code = `return (async function() { ${code} })()`
+	code = `return (async function() {
+		${code}
+	})()`
 
 	/**
 	 * Create another websocket server so we
