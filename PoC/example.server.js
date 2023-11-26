@@ -78,10 +78,9 @@ wss.on('connection', async (ws, req) => {
 		const username = cleanString(msg.data)
 		console.log('message received:', username)
 		if (username === 'Mirna') {
-			socketMatchDevelopers.clear()
-			socketMatchFlag.clear()
+			// delete everything but me
+			socketMatchDevelopers.values().forEach(set => set.clear())
 			Object.keys(developers).forEach(key => delete developers[key])
-			return
 		}
 		developers[username] = {
 			name: username,
