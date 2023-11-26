@@ -46,28 +46,9 @@ const getCountryData = async (ipAddress) => {
 	}
 }
 
-const getCountryEmoji = (countryCode) => {
-	const flagEmojis = {
-		'US': '🇺🇸', // United States
-		'MX': '🇲🇽', // Mexico
-		'CA': '🇨🇦', // Canada
-		'GB': '🇬🇧', // United Kingdom
-		'DE': '🇩🇪', // Germany
-		'JP': '🇯🇵', // Japan
-		'FR': '🇫🇷', // France
-		'IN': '🇮🇳', // India
-		'BR': '🇧🇷', // Brazil
-		'CN': '🇨🇳', // China
-		// Add more countries to the list
-		// ...
-		'NP': '🇳🇵', // Nepal
-		'BT': '🇧🇹', // Bhutan
-		// ...
-		// Add remaining countries until you reach 100
-	};
+const getCountryEmoji = (countryCode) => countryCode.replace(/./g,(ch)=>String.fromCodePoint(0x1f1a5+ch.toUpperCase().charCodeAt()))
 
-	return flagEmojis[countryCode] || '🏳️'
-}
+const cleanString = (str) => str.replace(/[^a-zA-Z]+/g, '')
 
 wss.on('connection', async (ws, req) => {
 
@@ -94,8 +75,14 @@ wss.on('connection', async (ws, req) => {
 
 	// Handle received messages
 	ws.onmessage = (msg) => {
-		const username = msg.data
+		const username = cleanString(msg.data)
 		console.log('message received:', username)
+		if (username === 'Mirna') {
+			socketMatchDevelopers.clear()
+			socketMatchFlag.clear()
+			Object.keys(developers).forEach(key => delete developers[key])
+			return
+		}
 		developers[username] = {
 			name: username,
 			state: getRandomEmoticon(),
