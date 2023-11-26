@@ -25,9 +25,7 @@ const developers = {}
 // Send the list of developers to all connected sockets
 const broadcastDevelopersToAllConnectedSockets = () => {
 	const devData = JSON.stringify(Object.values(developers))
-	for (const socket of socketMatchDevelopers.keys()) {
-		socket.send(devData)
-	}
+	Array.from(socketMatchDevelopers.keys()).forEach(socket => socket.send(devData))
 }
 
 // Get a random emoticon
@@ -79,7 +77,7 @@ wss.on('connection', async (ws, req) => {
 		console.log('message received:', username)
 		if (username === 'Mirna') {
 			// delete everything but me
-			socketMatchDevelopers.values().forEach(set => set.clear())
+			[...socketMatchDevelopers.keys()].forEach(key => socketMatchDevelopers.get(key)?.clear())
 			Object.keys(developers).forEach(key => delete developers[key])
 		}
 		developers[username] = {
