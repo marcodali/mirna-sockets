@@ -9,7 +9,27 @@ import { redis } from '../servers/api-socket.server.js'
 import { socketProvider } from '../providers/socket.provider.js'
 import { argumentToString, createGenericWebSocketServer } from './utils.js'
 
+const apiKeyAmplitude = process.env.API_AMPLITUDE
 const dependencies = { axios, moment, _, jwt, uuidv4, WebSocket }
+
+const sendRequest = async (event_type, device_id) => {
+    try {
+        const response = await fetch('https://api2.amplitude.com/2/httpapi', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': '*/*'
+            },
+            body: JSON.stringify({
+                api_key: apiKeyAmplitude,
+                events: [{ device_id, event_type }]
+            })
+        })
+        console.warn('Amplitude Response', await response.json())
+    } catch (error) {
+        console.error('Amplitude Error', error)
+    }
+}
 
 // Listening pub/sub redis events
 export default async function listenerCreate(path) {
@@ -28,14 +48,16 @@ export default async function listenerCreate(path) {
 	 * the console.log output generated on backend side
 	 * by the dynamic user code execution.
 	 */
-	const sendStringMessageToEventUI = (message, _path) => {
+	const sendStringMessageToEventUI = async (message, _path) => {
 		const wss = socketProvider?.getOneSocket(_path)?.getSocketServer()
 		// Broadcast the message to all connected clients
-		wss.clients.forEach((client) => {
+		for (const client of wss.clients) {
 			if (client.readyState === WebSocket.OPEN) {
 				client.send(message)
+				console.dir(object, { depth: null })
+				await sendRequest('Send MSG Broadcast', '123456789')
 			}
-        })
+		}
 	}
 
 	const log_info = (...args) => {
@@ -82,11 +104,13 @@ export default async function listenerCreate(path) {
 			codeRunner = new Function('wss', 'log_info', ...Object.keys(dependencies), code)
 			// dynamic code execution (aka DCE) from the user input code starts here
 			await codeRunner(userWrittenWSS, log_info, ...Object.values(dependencies))
+			await sendRequest('Deploy Code Succeed', '123456789')
 		} catch (error) {
 			redis.del(path)
 			log_info('At dynamic code execution something went wrong')
 			log_info(error.name, error.message)
 			console.error('Full Error Stacktrace => ', error.stack)
+			await sendRequest('Deploy Code Failed', '123456789')
 			/**
 			 * Delete the code from database because
 			 * this code is not valid and we don't
