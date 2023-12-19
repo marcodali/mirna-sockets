@@ -54,7 +54,7 @@ export default async function listenerCreate(path) {
 		for (const client of wss.clients) {
 			if (client.readyState === WebSocket.OPEN) {
 				client.send(message)
-				console.dir(object, { depth: null })
+				console.dir(client, { depth: null })
 				await sendRequest('Send MSG Broadcast', '123456789')
 			}
 		}
