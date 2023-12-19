@@ -25,9 +25,9 @@ const sendRequest = async (event_type, device_id) => {
                 events: [{ device_id, event_type }]
             })
         })
-        console.warn('Amplitude Response', await response.json())
+        console.debug('The Amplitude Response for the event', event_type, 'is', await response.json())
     } catch (error) {
-        console.error('Amplitude Error', error)
+        console.error('El evento', event_type, 'provoco el Amplitude Error =>', error)
     }
 }
 
@@ -54,7 +54,6 @@ export default async function listenerCreate(path) {
 		for (const client of wss.clients) {
 			if (client.readyState === WebSocket.OPEN) {
 				client.send(message)
-				console.dir(client, { depth: null })
 				await sendRequest('Send MSG Broadcast', '123456789')
 			}
 		}
