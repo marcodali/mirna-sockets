@@ -2,6 +2,7 @@ import WebSocket, { WebSocketServer } from 'ws'
 import axios from 'axios'
 import moment from 'moment'
 import _ from 'lodash'
+import * as Y from 'yjs'
 import jwt from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -10,7 +11,7 @@ import { socketProvider } from '../providers/socket.provider.js'
 import { argumentToString, createGenericWebSocketServer } from './utils.js'
 
 const apiKeyAmplitude = process.env.API_AMPLITUDE
-const dependencies = { axios, moment, _, jwt, uuidv4, WebSocket }
+const dependencies = { axios, moment, _, jwt, uuidv4, WebSocket, Y }
 
 const sendRequest = async (event_type, device_id) => {
     try {
